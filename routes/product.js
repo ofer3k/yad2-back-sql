@@ -18,16 +18,46 @@ const {
     photo,
     listSearch,
     listByFilter,
-    listByFilterNoSort,
+    // listByFilterNoSort,
     listOfProductsByUser,
     singleProduct,
     updateOne,
-    deleteOne
+    deleteOne,
+    createSQL,
+    createSQLProcedure,
+    listBySearchSQL,
+    listOfProductsByUserSQL,
+    listByFilterSQL,
+    // listByFilterNoSortSQL,
+    singleProductSQL,
+    updateOneSQL,
+    // listMSSQL,
+    insertApartmentMSSQL,
+    listByUserMSSQL,
+    getSingleApartmentMSSQL,
+    searchMSSQL,
+    deleteFomMSSQL
 } = require("../controllers/product");
 const { requireSignin, isAuth, isAdmin } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
 const { json } = require("body-parser");
 
+// list all products
+router.get("/products/by/search/sql", listBySearchSQL);
+// search (function)
+router.post("/products/by/Filter/sql", listByFilterSQL);
+// insert new apartment (procedure)
+router.post("/products/insert/mssql/:userID",insertApartmentMSSQL);
+//get all apartments for user by id on quert 
+router.get("/products/get/user/apartments/:userID", listByUserMSSQL);
+//get specific apartment by id in query
+router.get("/products/get/apartment/:apartmentID", getSingleApartmentMSSQL);
+//delete specific apartment by id in query 
+router.delete("/products/delete/apartment/:apartmentID", deleteFomMSSQL);
+
+
+
+// router.post("/products/search/mssql", searchMSSQL)
 router.get("/product/:productId", read);
 router.get("/photos",async (req,res)=>{
 const {resources} =await cloudinary.search.expression('folder:Home').sort_by('public_id','desc').max_results(30).execute()
@@ -35,10 +65,10 @@ console.log(resources)
 const publicIds=resources.map(file=>file.public_id)
 res.send(publicIds)
 });
+router.post("/product/create/sql/:user",createSQL);
+router.post("/product/create/sqlProcedure/:user",createSQLProcedure);
+router.post("/product/create/:userId", requireSignin, isAuth, isAdmin,create,);
 
-router.post("/product/create/:userId", requireSignin, isAuth, isAdmin,create,
- 
- );
 router.post("/upload", async (req,res)=>{
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
@@ -79,16 +109,25 @@ router.put(
 );
 
 router.get("/products", list);
+
+
 router.get("/products/by/user/:userId", listOfProductsByUser);
+router.get("/products/by/user/sql/:userId", listOfProductsByUserSQL);
 router.get("/products/search", listSearch);
 router.get("/products/related/:productId", listRelated);
 router.post("/single/product", singleProduct);
+router.post("/single/product/sql", singleProductSQL);
 router.post("/single/product/update", updateOne);
+router.post("/single/product/update/sql", updateOneSQL);
 router.post("/single/product/delete", deleteOne);
 router.get("/products/categories", listCategories);
 router.post("/products/by/search", listBySearch);
+
 router.post("/products/by/Filter", listByFilter);
-router.post("/products/by/Filter/noSort", listByFilterNoSort);
+
+
+// router.post("/products/by/Filter/noSort", listByFilterNoSort);
+// router.post("/products/by/Filter/noSort/sql", listByFilterNoSortSQL);
 router.get("/product/photo/:productId", photo);
 
 router.param("userId", userById);
